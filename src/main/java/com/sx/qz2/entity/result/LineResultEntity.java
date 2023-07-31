@@ -3,6 +3,9 @@ package com.sx.qz2.entity.result;
 
 import lombok.Data;
 
+/**
+ * ADS读取的数据结果实体类：线路
+ */
 @Data
 public class LineResultEntity {
     private  Integer id;

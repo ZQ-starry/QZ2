@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * @Author: ZhangQi
  * @Date: 2023/7/31 10:28
- * @Description:
+ * @Description: 所有数据结果的集合实体类
  */
 @Data
 public class ResultListsEntity {

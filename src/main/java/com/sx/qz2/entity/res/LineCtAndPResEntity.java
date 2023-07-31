@@ -5,7 +5,7 @@ import lombok.Data;
 /**
  * @Author: ZhangQi
  * @Date: 2023/7/24 9:38
- * @Description:
+ * @Description: 线路电流和功率实体
  */
 @Data
 public class LineCtAndPResEntity {

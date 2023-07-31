@@ -5,7 +5,7 @@ import lombok.Data;
 /**
  * @Author: ZhangQi
  * @Date: 2023/7/31 10:11
- * @Description:
+ * @Description: ADS读取的数据结果实体类：节点
  */
 @Data
 public class NodeResultEntity {

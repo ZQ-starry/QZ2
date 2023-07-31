@@ -5,7 +5,7 @@ import lombok.Data;
 /**
  * @Author: ZhangQi
  * @Date: 2023/7/25 14:35
- * @Description:
+ * @Description: 负荷情况实体
  */
 @Data
 public class LoadInfoEntity {

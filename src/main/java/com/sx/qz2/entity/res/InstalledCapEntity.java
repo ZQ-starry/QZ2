@@ -5,7 +5,7 @@ import lombok.Data;
 /**
  * @Author: ZhangQi
  * @Date: 2023/7/25 14:01
- * @Description:
+ * @Description: 装机容量实体
  */
 @Data
 public class InstalledCapEntity{

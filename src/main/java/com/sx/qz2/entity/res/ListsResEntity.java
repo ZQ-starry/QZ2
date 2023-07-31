@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * @Author: ZhangQi
  * @Date: 2023/7/24 10:11
- * @Description: 曲线数据的返回体
+ * @Description: 给前端返回的所有数据实体
  */
 @Data
 public class ListsResEntity extends BaseRes {

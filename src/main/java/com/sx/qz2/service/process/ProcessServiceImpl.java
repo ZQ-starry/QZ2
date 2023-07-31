@@ -56,7 +56,6 @@ public class ProcessServiceImpl implements ProcessService{
             }else {
                 listsResEntity.setStatus(ResStatus.FAILED);
             }
-
         }
         for (int i=0; i<nodeList.size(); i++){
             // 返回list放入节点的编号，如zh001
@@ -72,7 +71,6 @@ public class ProcessServiceImpl implements ProcessService{
                 listsResEntity.setStatus(ResStatus.FAILED);
             }
         }
-
         for (int i=0; i<tableNames.length; i++){
             if (i<8){
                 // 插入线路的数据,设备一的线路结果数据表从01101-01108，对应names位置0-7

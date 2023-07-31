@@ -5,7 +5,7 @@ import lombok.Data;
 /**
  * @Author: ZhangQi
  * @Date: 2023/7/25 14:43
- * @Description:
+ * @Description: 电网规模实体
  */
 @Data
 public class GridScaleEntity {
