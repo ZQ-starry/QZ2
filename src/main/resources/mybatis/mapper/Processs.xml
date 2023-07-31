@@ -2,12 +2,12 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.sx.qz2.dao.process.ProcessDao">
     <insert id="insertLineResult" useGeneratedKeys="true" parameterType="com.sx.qz2.entity.result.LineResultEntity">
-        INSERT INTO ${tableName}(current1_a,current1_b,current1_c,....)
+        INSERT INTO ${tableName}(current1_a,current1_b,current1_c,......续写一下)
         VALUES (#{current1A},#{current1B},#{current1C},...)
     </insert>
 
     <insert id="insertNodeResult" useGeneratedKeys="true" parameterType="com.sx.qz2.entity.result.LineResultEntity">
-        INSERT INTO ${tableName}(current1_a,current1_b,current1_c,....)
+        INSERT INTO ${tableName}(current1_a,current1_b,current1_c,.......续写一下)
         VALUES (#{current1A},#{current1B},#{current1C},...)
     </insert>
 </mapper>
