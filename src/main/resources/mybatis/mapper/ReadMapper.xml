@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.sx.qz2.dao.read.DataReadDao">
-    <select id="getLineCtAndP" parameterType="com.sx.qz2.entity.res.NodeInfoEntity" resultType="com.sx.qz2.entity.res.LineCtAndPResEntity">
+    <select id="getLineCtAndP" parameterType="com.sx.qz2.entity.req.NodeInfoEntity" resultType="com.sx.qz2.entity.res.LineCtAndPResEntity">
         SELECT id,
             ${nodeColumnName1} AS currentA,
             ${nodeColumnName2} AS currentB,
@@ -11,7 +11,7 @@
         FROM ${nodeTableName} ORDER BY id DESC LIMIT 40
     </select>
 
-    <select id="getSsVoltage" parameterType="com.sx.qz2.entity.res.NodeInfoEntity" resultType="com.sx.qz2.entity.res.SsVolResEntity">
+    <select id="getSsVoltage" parameterType="com.sx.qz2.entity.req.NodeInfoEntity" resultType="com.sx.qz2.entity.res.SsVolResEntity">
         SELECT id,
             ${nodeColumnName1} AS voltageA,
             ${nodeColumnName2} AS voltageB,

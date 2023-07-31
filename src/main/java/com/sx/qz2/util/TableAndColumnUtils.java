@@ -1,7 +1,7 @@
 package com.sx.qz2.util;
 
 
-import com.sx.qz2.entity.res.NodeInfoEntity;
+import com.sx.qz2.entity.req.NodeInfoEntity;
 
 /**
  * @Author: ZhangQi

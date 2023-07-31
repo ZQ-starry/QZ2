@@ -1,5 +1,6 @@
 package com.sx.qz2.dao.read;
 
+import com.sx.qz2.entity.req.NodeInfoEntity;
 import com.sx.qz2.entity.res.*;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;

@@ -1,4 +1,4 @@
-package com.sx.qz2.entity.res;
+package com.sx.qz2.entity.req;
 
 import com.sx.qz2.entity.data.TabAndColEntity;
 import lombok.Data;
