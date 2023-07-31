@@ -86,7 +86,7 @@ public class ProcessServiceImpl implements ProcessService{
                 listsResEntity.setStatus(ResStatus.FAILED);
             }
         }
-        for (int i=0; i<tableNames.length; i++){
+        for (int i=0; i<15; i++){
             if (i<8){
                 // 插入线路的数据,设备一的线路结果数据表从01101-01108，对应names位置0-7
                 processDao.insertLineResult(tableNames[i],lineList.get(i));
