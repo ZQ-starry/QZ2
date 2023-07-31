@@ -22,8 +22,8 @@ public interface ProcessDao {
     @Select("SELECT node_num FROM (SELECT * FROM node_info ORDER BY order_num) AS temp")
     String[] getNodeNum();
 
-    void insertLineResult(@Param("tableName") String name,LineResultEntity lineResultEntity);
+    void insertLineResult(@Param("tableName") String name, @Param("line") LineResultEntity lineResultEntity);
 
-    void insertNodeResult(@Param("tableName") String name, NodeResultEntity nodeResultEntity);
+    void insertNodeResult(@Param("tableName") String name, @Param("node")NodeResultEntity nodeResultEntity);
 
 }

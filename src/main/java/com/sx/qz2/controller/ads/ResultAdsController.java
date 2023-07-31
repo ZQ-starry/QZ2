@@ -7,6 +7,8 @@ import com.sx.qz2.util.AdsReadUtil;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.PostConstruct;
+
 /**
  * @Author: ZhangQi
  * @Date: 2023/7/31 10:30
@@ -17,6 +19,11 @@ public class ResultAdsController {
 
     private ProcessService processService = SpringUtil.getBean(ProcessService.class);
 
+
+    @PostConstruct
+    public void getTablesName(){
+        processService.getTablesName();
+    }
 
     @RequestMapping("/names")
     // 加个定时器

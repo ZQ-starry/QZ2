@@ -9,8 +9,10 @@ import com.sx.qz2.entity.result.LineResultEntity;
 import com.sx.qz2.entity.result.NodeResultEntity;
 import com.sx.qz2.entity.result.ResultListsEntity;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -21,16 +23,30 @@ import java.util.List;
 @Service
 public class ProcessServiceImpl implements ProcessService{
 
+    private static String[] tableNames = new String[30];
+    private static String[] numbers = new String[419];
+
     @Autowired
     private ProcessDao processDao;
 
     @Autowired
     private WebSocketService webSocketService;
 
+
+    /**
+     * 项目开始后执行一次
+     */
     @Override
-    public void dev1DataProcess(ResultListsEntity resultListsEntity) {
+    public void getTablesName() {
         // 取表名
-        String[] tableNames = processDao.getTablesName();
+        tableNames = processDao.getTablesName();
+        numbers = processDao.getNodeNum();
+        System.out.println(Arrays.toString(tableNames));
+    }
+
+    @Override
+    @Async("taskExecutor1")
+    public void dev1DataProcess(ResultListsEntity resultListsEntity) {
         // 执行数据插入，线路数据插入result的01101-01108，节点数据插入01202-01208
         List<LineResultEntity> lineList = resultListsEntity.getLineResultEntityList();
         List<NodeResultEntity> nodeList = resultListsEntity.getNodeResultEntityList();
@@ -38,7 +54,6 @@ public class ProcessServiceImpl implements ProcessService{
         发送给前端,对lineList做一下拆分，拆分为一条线路一个实体类
         先查线路对应的node_num
          */
-        String[] numbers = processDao.getNodeNum();
         ListsResEntity listsResEntity = new ListsResEntity();
         LineCtAndPResEntity lineCtAndPResEntity = new LineCtAndPResEntity();
         for (int i=0; i<lineList.size(); i++){
@@ -76,10 +91,11 @@ public class ProcessServiceImpl implements ProcessService{
                 // 插入线路的数据,设备一的线路结果数据表从01101-01108，对应names位置0-7
                 processDao.insertLineResult(tableNames[i],lineList.get(i));
             }else {
-                // 插入节点的数据，设备一的节点结果数据表从01202-01208，对应names位置17-23
+                // 插入节点的数据，设备一的节点结果数据表从01202-01208，对应names位置16-22
                 processDao.insertNodeResult(tableNames[i+9], nodeList.get(i));
             }
         }
 
     }
+
 }

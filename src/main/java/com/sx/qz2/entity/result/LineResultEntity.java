@@ -8,7 +8,6 @@ import lombok.Data;
  */
 @Data
 public class LineResultEntity {
-    private  Integer id;
     private float current1A;
     private float current1B;
     private float current1C;

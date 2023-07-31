@@ -9,7 +9,6 @@ import lombok.Data;
  */
 @Data
 public class NodeResultEntity {
-    private Integer id;
     private float voltage1A;
     private float voltage1B;
     private float voltage1C;
