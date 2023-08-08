@@ -33,9 +33,18 @@ public interface DataReadDao {
     @Select("SELECT * FROM grid_scale")
     List<GridScaleEntity> getGridScale();
 
-    @Select("SELECT * FROM load_rate_info")
-    List<LoadRateEntity> getLoadRate();
+    @Select("SELECT * FROM dev1_load_rate_line")
+    List<LoadRateEntity> getDev1LoadRateLine();
+    @Select("SELECT * FROM dev2_load_rate_line")
+    List<LoadRateEntity> getDev2LoadRateLine();
+    @Select("SELECT * FROM dev1_load_rate_node")
+    List<LoadRateEntity> getDev1LoadRateNode();
+    @Select("SELECT * FROM dev2_load_rate_node")
+    List<LoadRateEntity> getDev2LoadRateNode();
 
     @Select("SELECT * FROM line_load_rate_info")
     List<LoadRateEntity> getLineLoadRate();
+
+    @Select("SELECT time FROM (SELECT * FROM time_axis ORDER BY id LIMIT 40) AS TEMP")
+    String[] getTimeAxis();
 }

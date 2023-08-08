@@ -29,21 +29,28 @@ public class DataReadServiceImpl implements DataReadService{
     public ListsResEntity ssVoltageRead(NodeInfoReqEntity nodeInfoReqEntity) {
         ListsResEntity listsResEntity = new ListsResEntity();
         listsResEntity.setUser("QZ");
-        listsResEntity.setNodeNum(nodeInfoReqEntity.getNodeNum());
-        // 根据节点信息判断节点所在的表和字段编号
-        NodeInfoEntity nodeInfoEntity = dataReadDao.getNodeInfo(nodeInfoReqEntity.getNodeNum());
-        NodeInfoEntity nodeInfoAll = new TableAndColumnUtils().columnNames(nodeInfoEntity);
-        if (nodeInfoEntity == null){
-            listsResEntity.setStatus(ResStatus.FAILED);
-        }else {
-            List<SsVolResEntity> lists = dataReadDao.getSsVoltage(nodeInfoAll);
-            Collections.reverse(lists);
-            if (lists.isEmpty() | lists == null){
+        try {
+            listsResEntity.setNodeNum(nodeInfoReqEntity.getNodeNum());
+            // 根据节点信息判断节点所在的表和字段编号
+            NodeInfoEntity nodeInfoEntity = dataReadDao.getNodeInfo(nodeInfoReqEntity.getNodeNum());
+            NodeInfoEntity nodeInfoAll = new TableAndColumnUtils().columnNames(nodeInfoEntity);
+            // 时间轴查询
+            String[] times = dataReadDao.getTimeAxis();
+            if (nodeInfoEntity == null){
                 listsResEntity.setStatus(ResStatus.FAILED);
             }else {
-                listsResEntity.setSsVolResEntityList(lists);
-                listsResEntity.setStatus(ResStatus.SUCCESS);
+                List<SsVolResEntity> lists = dataReadDao.getSsVoltage(nodeInfoAll);
+                Collections.reverse(lists);
+                if (lists.isEmpty() | lists == null){
+                    listsResEntity.setStatus(ResStatus.FAILED);
+                }else {
+                    listsResEntity.setSsVolResEntityList(lists);
+                    listsResEntity.setTimes(times);
+                    listsResEntity.setStatus(ResStatus.SUCCESS);
+                }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return listsResEntity;
     }
@@ -52,21 +59,28 @@ public class DataReadServiceImpl implements DataReadService{
     public ListsResEntity lineCtAndPRead(NodeInfoReqEntity nodeInfoReqEntity) {
         ListsResEntity listsResEntity = new ListsResEntity();
         listsResEntity.setUser("QZ");
-        listsResEntity.setNodeNum(nodeInfoReqEntity.getNodeNum());
-        // 根据节点信息判断节点所在的表和字段编号
-        NodeInfoEntity nodeInfoEntity = dataReadDao.getNodeInfo(nodeInfoReqEntity.getNodeNum());
-        NodeInfoEntity nodeInfoAll = new TableAndColumnUtils().columnNames(nodeInfoEntity);
-        if (nodeInfoEntity == null){
-            listsResEntity.setStatus(ResStatus.FAILED);
-        }else {
-            List<LineCtAndPResEntity> lists = dataReadDao.getLineCtAndP(nodeInfoAll);
-            Collections.reverse(lists);
-            if (lists.isEmpty() | lists == null){
+        try {
+            listsResEntity.setNodeNum(nodeInfoReqEntity.getNodeNum());
+            // 根据节点信息判断节点所在的表和字段编号
+            NodeInfoEntity nodeInfoEntity = dataReadDao.getNodeInfo(nodeInfoReqEntity.getNodeNum());
+            NodeInfoEntity nodeInfoAll = new TableAndColumnUtils().columnNames(nodeInfoEntity);
+            // 时间轴查询
+            String[] times = dataReadDao.getTimeAxis();
+            if (nodeInfoEntity == null){
                 listsResEntity.setStatus(ResStatus.FAILED);
             }else {
-                listsResEntity.setLineCtAndPResEntityList(lists);
-                listsResEntity.setStatus(ResStatus.SUCCESS);
+                List<LineCtAndPResEntity> lists = dataReadDao.getLineCtAndP(nodeInfoAll);
+                Collections.reverse(lists);
+                if (lists.isEmpty() | lists == null){
+                    listsResEntity.setStatus(ResStatus.FAILED);
+                }else {
+                    listsResEntity.setLineCtAndPResEntityList(lists);
+                    listsResEntity.setTimes(times);
+                    listsResEntity.setStatus(ResStatus.SUCCESS);
+                }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return listsResEntity;
     }
@@ -129,13 +143,19 @@ public class DataReadServiceImpl implements DataReadService{
     public ListsResEntity loadRateRead() {
         ListsResEntity listsResEntity = new ListsResEntity();
         try {
-            List<LoadRateEntity> list = dataReadDao.getLoadRate();
-            if (list == null){
+            List<LoadRateEntity> list1 = dataReadDao.getDev1LoadRateLine();
+            List<LoadRateEntity> list2 = dataReadDao.getDev2LoadRateLine();
+            List<LoadRateEntity> list3 = dataReadDao.getDev1LoadRateNode();
+            List<LoadRateEntity> list4 = dataReadDao.getDev2LoadRateNode();
+            list1.addAll(list2);
+            list1.addAll(list3);
+            list1.addAll(list4);
+            if (list1 == null){
                 listsResEntity.setStatus(ResStatus.FAILED);
             }else {
                 listsResEntity.setUser("QZ");
                 listsResEntity.setStatus(ResStatus.SUCCESS);
-                listsResEntity.setLoadRateEntityList(list);
+                listsResEntity.setLoadRateEntityList(list1);
             }
         }catch (Exception e){
             e.printStackTrace();
@@ -143,21 +163,4 @@ public class DataReadServiceImpl implements DataReadService{
         return listsResEntity;
     }
 
-    @Override
-    public ListsResEntity lineLoadRateRead() {
-        ListsResEntity listsResEntity = new ListsResEntity();
-        try {
-            List<LoadRateEntity> list = dataReadDao.getLineLoadRate();
-            if (list == null){
-                listsResEntity.setStatus(ResStatus.FAILED);
-            }else {
-                listsResEntity.setUser("QZ");
-                listsResEntity.setStatus(ResStatus.SUCCESS);
-                listsResEntity.setLoadRateEntityList(list);
-            }
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        return listsResEntity;
-    }
 }

@@ -15,6 +15,9 @@ import java.util.List;
 @Data
 public class ListsResEntity extends BaseRes {
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @ApiModelProperty(name = "times", value = "时间轴")
+    private String[] times;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     @ApiModelProperty(name = "ssVolResEntityList", value = "查询电压时仅返回该集合,不返回其他集合")

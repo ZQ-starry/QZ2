@@ -13,4 +13,5 @@ import java.util.List;
 public class ResultListsEntity {
     private List<LineResultEntity> lineResultEntityList;
     private List<NodeResultEntity> nodeResultEntityList;
+    private Float[] nodeUI;
 }

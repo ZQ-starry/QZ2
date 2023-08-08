@@ -85,26 +85,14 @@ public class DataReadController {
     }
 
     /**
-     * 主网线路负载率查询
-     * @return
-     */
-    @GetMapping("/getLineLoadRate")
-    @ResponseBody
-    @ApiOperation(value = "主网线路负载率查询")
-    public ListsResEntity lineLoadRateRead(){
-        return dataReadService.lineLoadRateRead();
-    }
-
-    /**
-     * 主网其他节点负载率查询
+     * 主网负载率查询
      * @return
      */
     @GetMapping("/getLoadRate")
     @ResponseBody
-    @ApiOperation(value = "主网其他节点负载率查询")
+    @ApiOperation(value = "主网负载率查询")
     public ListsResEntity loadRateRead(){
         return dataReadService.loadRateRead();
     }
-
 
 }

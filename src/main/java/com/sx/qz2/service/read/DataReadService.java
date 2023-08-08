@@ -22,5 +22,4 @@ public interface DataReadService {
 
     ListsResEntity loadRateRead();
 
-    ListsResEntity lineLoadRateRead();
 }

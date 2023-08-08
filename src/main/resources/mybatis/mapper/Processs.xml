@@ -1,13 +1,115 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.sx.qz2.dao.process.ProcessDao">
-    <insert id="insertLineResult" useGeneratedKeys="true">
-        INSERT INTO ${tableName}(current1_a,current1_b,current1_c,......续写一下)
-        VALUES (#{current1A},#{current1B},#{current1C},...)
+    <insert id="insertLineResult" useGeneratedKeys="true" >
+        INSERT INTO ${tableName}(current1_a,current1_b,current1_c,power_active1,power_reactive1,
+                                 current2_a,current2_b,current2_c,power_active2,power_reactive2,
+                                 current3_a,current3_b,current3_c,power_active3,power_reactive3,
+                                 current4_a,current4_b,current4_c,power_active4,power_reactive4,
+                                 current5_a,current5_b,current5_c,power_active5,power_reactive5,
+                                 current6_a,current6_b,current6_c,power_active6,power_reactive6,
+                                 current7_a,current7_b,current7_c,power_active7,power_reactive7,
+                                 current8_a,current8_b,current8_c,power_active8,power_reactive8,
+                                 current9_a,current9_b,current9_c,power_active9,power_reactive9,
+                                 current10_a,current10_b,current10_c,power_active10,power_reactive10,
+                                 current11_a,current11_b,current11_c,power_active11,power_reactive11,
+                                 current12_a,current12_b,current12_c,power_active12,power_reactive12,
+                                 current13_a,current13_b,current13_c,power_active13,power_reactive13,
+                                 current14_a,current14_b,current14_c,power_active14,power_reactive14,
+                                 current15_a,current15_b,current15_c,power_active15,power_reactive15
+                                 )
+        VALUES (#{line.current1A},#{line.current1B},#{line.current1C},#{line.powerActive1},#{line.powerReactive1},
+                #{line.current2A},#{line.current2B},#{line.current2C},#{line.powerActive2},#{line.powerReactive2},
+                #{line.current3A},#{line.current3B},#{line.current3C},#{line.powerActive3},#{line.powerReactive3},
+                #{line.current4A},#{line.current4B},#{line.current4C},#{line.powerActive4},#{line.powerReactive4},
+                #{line.current5A},#{line.current5B},#{line.current5C},#{line.powerActive5},#{line.powerReactive5},
+                #{line.current6A},#{line.current6B},#{line.current6C},#{line.powerActive6},#{line.powerReactive6},
+                #{line.current7A},#{line.current7B},#{line.current7C},#{line.powerActive7},#{line.powerReactive7},
+                #{line.current8A},#{line.current8B},#{line.current8C},#{line.powerActive8},#{line.powerReactive8},
+                #{line.current9A},#{line.current9B},#{line.current9C},#{line.powerActive9},#{line.powerReactive9},
+                #{line.current10A},#{line.current10B},#{line.current10C},#{line.powerActive10},#{line.powerReactive10},
+                #{line.current11A},#{line.current11B},#{line.current11C},#{line.powerActive11},#{line.powerReactive11},
+                #{line.current12A},#{line.current12B},#{line.current12C},#{line.powerActive12},#{line.powerReactive12},
+                #{line.current13A},#{line.current13B},#{line.current13C},#{line.powerActive13},#{line.powerReactive13},
+                #{line.current14A},#{line.current14B},#{line.current14C},#{line.powerActive14},#{line.powerReactive14},
+                #{line.current15A},#{line.current15B},#{line.current15C},#{line.powerActive15},#{line.powerReactive15}
+                )
     </insert>
 
-    <insert id="insertNodeResult" useGeneratedKeys="true">
-        INSERT INTO ${tableName}(current1_a,current1_b,current1_c,.......续写一下)
-        VALUES (#{current1A},#{current1B},#{current1C},...)
+    <insert id="insertNodeResult" useGeneratedKeys="true" >
+        INSERT INTO ${tableName}(voltage1_a,voltage1_b,voltage1_c,
+                                 voltage2_a,voltage2_b,voltage2_c,
+                                 voltage3_a,voltage3_b,voltage3_c,
+                                 voltage4_a,voltage4_b,voltage4_c,
+                                 voltage5_a,voltage5_b,voltage5_c,
+                                 voltage6_a,voltage6_b,voltage6_c,
+                                 voltage7_a,voltage7_b,voltage7_c,
+                                 voltage8_a,voltage8_b,voltage8_c,
+                                 voltage9_a,voltage9_b,voltage9_c,
+                                 voltage10_a,voltage10_b,voltage10_c,
+                                 voltage11_a,voltage11_b,voltage11_c,
+                                 voltage12_a,voltage12_b,voltage12_c,
+                                 voltage13_a,voltage13_b,voltage13_c,
+                                 voltage14_a,voltage14_b,voltage14_c,
+                                 voltage15_a,voltage15_b,voltage15_c)
+        VALUES (
+                   #{node.voltage1A},#{node.voltage1B},#{node.voltage1C},
+                   #{node.voltage2A},#{node.voltage2B},#{node.voltage2C},
+                   #{node.voltage3A},#{node.voltage3B},#{node.voltage3C},
+                   #{node.voltage4A},#{node.voltage4B},#{node.voltage4C},
+                   #{node.voltage5A},#{node.voltage5B},#{node.voltage5C},
+                   #{node.voltage6A},#{node.voltage6B},#{node.voltage6C},
+                   #{node.voltage7A},#{node.voltage7B},#{node.voltage7C},
+                   #{node.voltage8A},#{node.voltage8B},#{node.voltage8C},
+                   #{node.voltage9A},#{node.voltage9B},#{node.voltage9C},
+                   #{node.voltage10A},#{node.voltage10B},#{node.voltage10C},
+                   #{node.voltage11A},#{node.voltage11B},#{node.voltage11C},
+                   #{node.voltage12A},#{node.voltage12B},#{node.voltage12C},
+                   #{node.voltage13A},#{node.voltage13B},#{node.voltage13C},
+                   #{node.voltage14A},#{node.voltage14B},#{node.voltage14C},
+                   #{node.voltage15A},#{node.voltage15B},#{node.voltage15C}
+                   )
     </insert>
+
+
+    <select id="selectLineData" resultType="com.sx.qz2.entity.result.LineResultEntity">
+        select * from ${tableName} ORDER BY id LIMIT 1
+    </select>
+
+
+    <update id="updateLineLoadRatioDev1" parameterType="java.util.List">
+        <foreach collection="updateList" item="entity" separator=";">
+            UPDATE dev1_load_rate_line
+            <set>
+                load_rate=#{entity.loadRate}
+            </set>
+            <where>
+                id=#{entity.id}
+            </where>
+        </foreach>
+    </update>
+
+    <update id="updateNodeLoadRatioDev1" parameterType="java.util.List">
+        <foreach collection="updateList" item="entity" separator=";">
+            UPDATE dev1_load_rate_node
+            <set>
+                load_rate=#{entity.loadRate}
+            </set>
+            <where>
+                id=#{entity.id}
+            </where>
+        </foreach>
+    </update>
+
+    <update id="updateLineLoadRatioDev2" parameterType="java.util.List">
+        <foreach collection="updateList" item="entity" separator=";">
+            UPDATE dev2_load_rate_line
+            <set>
+                load_rate=#{entity.loadRate}
+            </set>
+            <where>
+                id=#{entity.id}
+            </where>
+        </foreach>
+    </update>
 </mapper>
