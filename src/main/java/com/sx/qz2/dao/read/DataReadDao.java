@@ -41,7 +41,6 @@ public interface DataReadDao {
     List<LoadRateEntity> getDev1LoadRateNode();
     @Select("SELECT * FROM dev2_load_rate_node")
     List<LoadRateEntity> getDev2LoadRateNode();
-
     @Select("SELECT * FROM line_load_rate_info")
     List<LoadRateEntity> getLineLoadRate();
 

@@ -22,18 +22,19 @@ public interface ProcessDao {
 
     @Select("SELECT node_num FROM (SELECT * FROM node_info ORDER BY order_num) AS temp")
     String[] getNodeNum();
+
     //查询线路和节点的额定容量
-    @Select("SELECT  rated_capacity FROM  dev1_capacity_line ORDER BY id asc")
+    @Select("SELECT rated_capacity FROM dev1_capacity_line ORDER BY id asc")
     Float[] getLineRatedCurrentDev1();
 
-    @Select("SELECT  rated_capacity FROM  dev2_capacity_line ORDER BY id asc")
+    @Select("SELECT rated_capacity FROM dev2_capacity_line ORDER BY id asc")
     Float[] getLineRatedCurrentDev2();
 
-    @Select("SELECT  rated_capacity FROM  dev1_capacity_node ORDER BY id asc")
+    @Select("SELECT rated_capacity FROM dev1_capacity_node ORDER BY id asc")
     Float[] getNodeRatedCapacityDev1();
 
-    // @Select("SELECT  rated_capacity FROM  dev2_capacity_node ORDER BY id asc")
-    // Float[] getNodeRatedCapacityDev2();
+    @Select("SELECT rated_capacity FROM dev2_capacity_node ORDER BY id asc")
+    Float[] getNodeRatedCapacityDev2();
 
     int updateLineLoadRatioDev1( List<LoadRateEntity> updateList);
 
@@ -52,4 +53,6 @@ public interface ProcessDao {
     @Options(useGeneratedKeys=true)
     @Insert("INSERT INTO time_axis SET time = #{time}")
     void insertTime(String time);
+
+
 }

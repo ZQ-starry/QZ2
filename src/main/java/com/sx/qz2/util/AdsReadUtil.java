@@ -21,25 +21,22 @@ import java.util.List;
  */
 public class AdsReadUtil {
 
+    private static final String NetId1 = "169.254.118.233.1.1"; // 设备1 NetId
 
-    private static final String NetId1 = "169.254.118.233.1.1";
-
-    private static final String NetId2 = "192.168.1.50.1.1";
+    private static final String NetId2 = "192.168.1.50.1.1"; // 设备2 NetId
 
     /**
-     * 包含8个线路表（三相电流+有功无功功率）的数据，7个节点表（三相电压）的数据
-     * 长度8*15*5+7*15*3=3660
-     *
+     * 8.14拆分版本：设备1含25个T节点，变电站39，电厂22，牵引站3，线路102
      * @return
      */
     public ResultListsEntity dev1StructRead() {
         ResultListsEntity resultListsEntity = new ResultListsEntity();
         List<LineResultEntity> lineList = new ArrayList<>();
         List<NodeResultEntity> nodeList = new ArrayList<>();
-        //用来存42个节点的实际容量
-        Float[] nodeUIFloats = new Float[82];
+        //用来存40个变电站的UI值
+        Float[] nodeUIFloats = new Float[39];
         //该长度代表8张线路表 7张节点表 以及82个节点(实际容量) 需要的数据长度
-        int length = 8 * 15 * 5 * 4 + 7 * 15 * 3 * 4+82*4;
+        int length = (7*75+6*45+40)*4;
         long err;
         AmsAddr addr = new AmsAddr();
         try {
@@ -91,24 +88,25 @@ public class AdsReadUtil {
                 ByteBuffer responseBuffer = ByteBuffer.wrap(dataBuff.getByteArray());
                 responseBuffer.order(ByteOrder.LITTLE_ENDIAN);
                 // dataBuff为读取到的总的结构体
-                for (int i = 0; i < 16; i++) {
+                for (int i = 0; i < 14; i++) {
                     LineResultEntity lineResultEntity = new LineResultEntity();
                     NodeResultEntity nodeResultEntity = new NodeResultEntity();
-                    if (i < 8) {
+                    if (i < 7) {
                         // 处理线路数据
                         for (int j = 0; j < 75; j++) {
-                            lines[j].set(lineResultEntity, responseBuffer.getFloat(i * 75 * 4 + j * 4));
+                            lines[j].set(lineResultEntity, responseBuffer.getFloat(i*75*4 + j*4));
                         }
                         lineList.add(lineResultEntity);
-                    } else if(i==15){
-                        for (int j=0;j<82;j++){
-                            nodeUIFloats[j]=responseBuffer.getFloat(3660+j*4);
+                    } else if(i==13){
+                        // 处理 UI数据
+                        for (int j=0;j<40;j++){
+                            nodeUIFloats[j]=responseBuffer.getFloat(3180+j*4); // 3180=(7*75+6*45)*4
                         }
                     }
                     else {
                         // 处理节点数据
                         for (int j = 0; j < 45; j++) {
-                            nodes[j].set(nodeResultEntity, responseBuffer.getFloat(i*300+(i-8)* 45 * 4 + j * 4));
+                            nodes[j].set(nodeResultEntity, responseBuffer.getFloat(i*300+(i-7)*45*4 + j*4));
                         }
                         nodeList.add(nodeResultEntity);
                     }
@@ -127,14 +125,17 @@ public class AdsReadUtil {
     }
 
 
+    /**、
+     * 8.14拆分版本：设备2含T节点31，变电站43，电厂22，牵引站3，线路128，光伏电站1
+     * @return
+     */
     public ResultListsEntity dev2StructRead() {
         ResultListsEntity resultListsEntity = new ResultListsEntity();
         List<LineResultEntity> lineList = new ArrayList<>();
         List<NodeResultEntity> nodeList = new ArrayList<>();
         //用来存41个节点的实际容量
-        Float[] nodeUIFloats = new Float[41];
-        //该长度代表8张线路表 6张节点表 以及41个节点(实际容量) 需要的数据长度
-        int length = 8 * 15 * 5 * 4 + 6 * 15 * 3 ;
+        Float[] nodeUIFloats = new Float[43];
+        int length = (9*75+7*45+43)*4;
         long err;
         AmsAddr addr = new AmsAddr();
         try {
@@ -186,20 +187,24 @@ public class AdsReadUtil {
                 ByteBuffer responseBuffer = ByteBuffer.wrap(dataBuff.getByteArray());
                 responseBuffer.order(ByteOrder.LITTLE_ENDIAN);
                 // dataBuff为读取到的总的结构体
-                for (int i = 0; i < 15; i++) {
+                for (int i = 0; i < 17; i++) {
                     LineResultEntity lineResultEntity = new LineResultEntity();
                     NodeResultEntity nodeResultEntity = new NodeResultEntity();
-                    if (i < 8) {
+                    if (i < 9) {
                         // 处理线路数据
                         for (int j = 0; j < 75; j++) {
-                            lines[j].set(lineResultEntity, responseBuffer.getFloat(i * 75 * 4 + j * 4));
+                            lines[j].set(lineResultEntity, responseBuffer.getFloat(i*75*4 + j*4));
                         }
                         lineList.add(lineResultEntity);
-                    }
-                    else {
+                    } else if(i==16){
+                        // 处理 UI数据
+                        for (int j=0;j<43;j++){
+                            nodeUIFloats[j]=responseBuffer.getFloat(3960+j*4); // 3960=(9*75+7*45)*4
+                        }
+                    } else {
                         // 处理节点数据
                         for (int j = 0; j < 45; j++) {
-                            nodes[j].set(nodeResultEntity, responseBuffer.getFloat(i*300+(i-8)* 45 * 4 + j * 4));
+                            nodes[j].set(nodeResultEntity, responseBuffer.getFloat(i*300+(i-9)*45*4 + j*4));
                         }
                         nodeList.add(nodeResultEntity);
                     }

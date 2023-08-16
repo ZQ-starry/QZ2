@@ -84,7 +84,7 @@
                 load_rate=#{entity.loadRate}
             </set>
             <where>
-                id=#{entity.id}
+                id=#{entity.nodeNum}
             </where>
         </foreach>
     </update>
@@ -96,7 +96,7 @@
                 load_rate=#{entity.loadRate}
             </set>
             <where>
-                id=#{entity.id}
+                id=#{entity.nodeNum}
             </where>
         </foreach>
     </update>
@@ -108,7 +108,7 @@
                 load_rate=#{entity.loadRate}
             </set>
             <where>
-                id=#{entity.id}
+                id=#{entity.nodeNum}
             </where>
         </foreach>
     </update>

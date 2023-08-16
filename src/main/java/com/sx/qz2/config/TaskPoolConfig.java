@@ -16,10 +16,13 @@ import java.util.concurrent.ThreadPoolExecutor;
 public class TaskPoolConfig {
 
     private int corePoolSize = 2;
+
     private int maxPoolSize = 4;
+
     private int queueCapacity= 20;
 
-    @Bean("taskExecutor1")
+
+    @Bean("task1")
     public Executor taskExecutor1() {
         log.warn("start asyncServiceExecutor");
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
@@ -35,7 +38,7 @@ public class TaskPoolConfig {
         return executor;
     }
 
-    @Bean("taskExecutor2")
+    @Bean("task2")
     public Executor taskExecutor2() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         //设置为1，任务顺序执行

@@ -11,6 +11,7 @@ import com.sx.qz2.entity.res.SsVolResEntity;
 import com.sx.qz2.entity.result.LineResultEntity;
 import com.sx.qz2.entity.result.NodeResultEntity;
 import com.sx.qz2.entity.result.ResultListsEntity;
+import com.sx.qz2.service.read.DataReadServiceImpl;
 import com.sx.qz2.util.DateUtils;
 import com.sx.qz2.util.LoadRateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,14 +31,37 @@ import java.util.List;
 @Service
 public class ProcessServiceImpl implements ProcessService{
 
-    private static String[] tableNames = new String[30];
-    private static String[] numbers = new String[419];
-
     private DateUtils dateUtils = new DateUtils();
     // 用于计算时间轴
     private static int countDev1 = 0;
 
     private static int countDev2 = 0;
+    // 设备1的线路数量
+    private final static int Dev1LineNum = 102;
+    // 设备1的节点数量
+    private final static int Dev1NodeNum = 89;
+    // 设备2的线路数量
+    private final static int Dev2LineNum = 128;
+    // 设备2的节点数量
+    private final static int Dev2NodeNum = 100;
+    // 设备1的线路结果表个数
+    private final static int Dev1LineTableNum = 7;
+    // 设备1的节点结果表个数
+    private final static int Dev1NodeTableNum = 6;
+    // 设备2的线路表个数
+    private final static int Dev2LineTableNum = 9;
+    // 设备2的节点结果表个数
+    private final static int Dev2NodeTableNum = 7;
+    // 所有表的表名
+    private static String[] tableNames = new String[Dev1LineTableNum+Dev1NodeTableNum+Dev2LineTableNum+Dev2NodeTableNum];
+    //设备1中线路编号的数组
+    private static String[] Dev1LineNums = new String[Dev1LineNum];
+    //设备1中节点编号的数组
+    private static String[] Dev1NodeNums = new String[Dev1NodeNum];
+    //设备2中线路编号的数组
+    private static String[] Dev2LineNums = new String[Dev2LineNum];
+    //设备2中节点编号的数组
+    private static String[] Dev2NodeNums = new String[Dev2NodeNum];
 
     @Autowired
     private ProcessDao processDao;
@@ -48,7 +72,8 @@ public class ProcessServiceImpl implements ProcessService{
     @Autowired
     private DataReadDao dataReadDao;
 
-
+    @Autowired
+    private DataReadServiceImpl dataReadServiceImpl;
     /**
      * 项目开始后执行一次
      */
@@ -57,7 +82,24 @@ public class ProcessServiceImpl implements ProcessService{
         // 取结果要保存的表名
         tableNames = processDao.getTablesName();
         // 取线路与节点的编号，如zh001，zh002
-        numbers = processDao.getNodeNum();
+        String[] nodeNums = processDao.getNodeNum();
+        // 编号的分类
+        for (int i=0; i<nodeNums.length; i++){
+            // 设备1线路编号
+            if (i<Dev1LineNum+Dev1NodeNum+Dev2LineNum){
+                if (i<Dev1LineNum+Dev1NodeNum){
+                    if (i<Dev1LineNum){
+                        Dev1LineNums[i] = nodeNums[i];
+                    }else {
+                        Dev1NodeNums[i-Dev1LineNum] = nodeNums[i];
+                    }
+                }else {
+                    Dev2LineNums[i-Dev1LineNum+Dev1NodeNum] = nodeNums[i];
+                }
+            }else {
+                Dev2NodeNums[i-Dev1LineNum+Dev1NodeNum+Dev2LineNum] = nodeNums[i];
+            }
+        }
         // 截断所有结果表
 //        for (String tableName:tableNames){
 //            processDao.truncateTable(tableName);
@@ -68,154 +110,195 @@ public class ProcessServiceImpl implements ProcessService{
     @Override
     @Transactional
     public void dev1DataProcess (ResultListsEntity resultListsEntity)  {
-        // 时间轴,获取时间并插入表
+        // 时间轴,获取时间并入库
         String[] times = new String[1];
         times[0] = dateUtils.timelineUtil(countDev1+1);
         countDev1++;
         processDao.insertTime(times[0]);
 
-        // 执行数据插入，线路数据插入result的01101-01108，节点数据插入01202-01208
         List<LineResultEntity> lineList = resultListsEntity.getLineResultEntityList();
         List<NodeResultEntity> nodeList = resultListsEntity.getNodeResultEntityList();
         /*
         发送给前端,对lineList和nodeList 做一下拆分，拆分为一条线路一个实体类
          */
-        // 处理线路的电流与功率数据
-        for (int i=0; i<lineList.size(); i++){
-            // 返回list放入节点的编号，如zh001
-            for (int j=0;j<15;j++){
-                ListsResEntity listsResEntity = new ListsResEntity();
-                listsResEntity.setNodeNum(numbers[i*15+j]);
-                listsResEntity.setTimes(times);
-                lineDataProcessor(lineList, i, j, listsResEntity);
+        // 处理设备1的线路电流与功率数据
+        for (int i=0; i<Dev1LineTableNum; i++){
+            // 返回list放入线路的编号，如zh001
+            if (i != Dev1LineTableNum-1){
+                for (int j=0; j<15; j++){
+                    ListsResEntity listsResEntity = new ListsResEntity();
+                    listsResEntity.setNodeNum(Dev1LineNums[i*15+j]);
+                    listsResEntity.setTimes(times);
+                    lineDataProcessor(lineList, i, j, listsResEntity);
+                }
+            }else {
+                // 最后一个表数据不满
+                int end = Dev1LineNum%15;
+                for (int j=0; j<end; j++){
+                    ListsResEntity listsResEntity = new ListsResEntity();
+                    listsResEntity.setNodeNum(Dev1LineNums[i*15+j]);
+                    listsResEntity.setTimes(times);
+                    lineDataProcessor(lineList, i, j, listsResEntity);
+                }
             }
+
         }
-        // 处理节点的电压数据
-        for (int i=0; i<nodeList.size(); i++){
-            for(int j=0;j<15;j++){
-                // 返回list放入节点的编号，如zh001
-                //每次需要传只含有一个点的信息的集合给前端 所以每次循环都需要新建一个集合和一个实体类。
-                ListsResEntity listsResEntity = new ListsResEntity();
-                listsResEntity.setNodeNum(numbers[i*15+j+229]);
-                listsResEntity.setTimes(times);
-                nodeDataProcessor(nodeList, i, j, listsResEntity);
+        // 处理设备1的节点电压数据
+        for (int i=0; i<Dev1NodeTableNum; i++){
+            if (i != Dev1NodeTableNum-1){
+                for(int j=0; j<15; j++){
+                    // 返回list放入节点的编号，如zh001
+                    ListsResEntity listsResEntity = new ListsResEntity();
+                    // 编号位置从设备1的线路编号最后一个的位置开始
+                    listsResEntity.setNodeNum(Dev1NodeNums[i*15+j]);
+                    listsResEntity.setTimes(times);
+                    nodeDataProcessor(nodeList, i, j, listsResEntity);
+                }
+            }else {
+                int end = Dev1NodeNum%15;
+                for(int j=0; j<end; j++){
+                    // 返回list放入节点的编号，如zh001
+                    ListsResEntity listsResEntity = new ListsResEntity();
+                    // 编号位置从设备1的线路编号最后一个的位置开始
+                    listsResEntity.setNodeNum(Dev1NodeNums[i*15+j]);
+                    listsResEntity.setTimes(times);
+                    nodeDataProcessor(nodeList, i, j, listsResEntity);
+                }
             }
         }
         /**
-         * 线路结果数据和节点结果数据插入数据库
+         * 执行数据插入，线路数据插入result的line011-line017，节点数据插入node011-016
          */
-        for (int i=0; i<15; i++){
-            if (i<8){
-                // 插入线路的数据,设备一的线路结果数据表从01101-01108，对应names位置0-7
+        for (int i=0; i<Dev1LineTableNum+Dev1NodeTableNum; i++){
+            if (i < Dev1LineTableNum){
+                // 插入线路的数据,对应tableNames位置0-6
                 processDao.insertLineResult(tableNames[i],lineList.get(i));
             }else {
-                // 插入节点的数据，设备一的节点结果数据表从01202-01208，对应names位置16-22
-                processDao.insertNodeResult(tableNames[i+8], nodeList.get(i-8));
+                // 插入节点的数据，对应tableNames位置7-12
+                processDao.insertNodeResult(tableNames[i], nodeList.get(i-Dev1LineTableNum));
             }
         }
         /*
-           线路与节点（变电站）负载率计算
+           线路负载率=单相电流/额定电流
          */
         LoadRateUtil loadRateUtil = new LoadRateUtil();
         List<LineResultEntity> lineList1 = new ArrayList<>();
-        // 获取线路的额定电流
+        // 取库中各线路的额定电流
         Float[] ratedCurrents = processDao.getLineRatedCurrentDev1();
-        //取出Dev1中所有线路的信息
-        for (int i=0; i<8; i++){
+        for (int i=0; i<Dev1LineTableNum; i++){
+            // 从库中取出设备1的最新的一次线路的三相电流、有功无功等数据
             LineResultEntity lineResultEntity = processDao.selectLineData(tableNames[i]);
             lineList1.add(lineResultEntity);
         }
-        List<LoadRateEntity>  lineLoadRatioDev1 = loadRateUtil.lineLoadRateDev1(lineList1, ratedCurrents);
+        // 执行线路负载率的计算,把节点的编号一起传过去处理
+        List<LoadRateEntity>  lineLoadRatioDev1 = loadRateUtil.lineLoadRate(Dev1LineNums,lineList1, ratedCurrents);
         // 更新dev1中线路负载率
         processDao.updateLineLoadRatioDev1(lineLoadRatioDev1);
-        // 变电站负载率计算
+        /*
+        变电站负载率=UI/额定容量
+         */
+        // 取读取数据中的UI值
         Float[] uis = resultListsEntity.getNodeUI();
         // 取库中的变电站的额定容量
         Float[] nodeRatedCapacity = processDao.getNodeRatedCapacityDev1();
-        List<LoadRateEntity> nodeLoadRatioDev1 = loadRateUtil.nodeLoadRateDev1(uis,nodeRatedCapacity);
-        // 更新库中的变压器负载率
+        List<LoadRateEntity> nodeLoadRatioDev1 = loadRateUtil.nodeLoadRate(Dev1NodeNums,uis,nodeRatedCapacity);
+        // 更新库中的变电站负载率
         processDao.updateNodeLoadRatioDev1(nodeLoadRatioDev1);
         /**
          * 查询一次所有的负载率，发送给前端
          */
-        ListsResEntity listsResEntity1 = new ListsResEntity();
-        List<LoadRateEntity> list1 = dataReadDao.getDev1LoadRateLine();
-        List<LoadRateEntity> list2 = dataReadDao.getDev2LoadRateLine();
-        List<LoadRateEntity> list3 = dataReadDao.getDev1LoadRateNode();
-        List<LoadRateEntity> list4 = dataReadDao.getDev2LoadRateNode();
-        list1.addAll(list2);
-        list1.addAll(list3);
-        list1.addAll(list4);
-        if (list1 == null){
-            listsResEntity1.setStatus(ResStatus.FAILED);
-        }else {
-            listsResEntity1.setUser("QZ");
-            listsResEntity1.setStatus(ResStatus.SUCCESS);
-            listsResEntity1.setLoadRateEntityList(list1);
-        }
+        ListsResEntity listsResEntity1 = dataReadServiceImpl.loadRateRead();
         webSocketService.sendTextMsg("/response/getLoadRate",listsResEntity1);
     }
 
     @Override
     public void dev2DataProcess (ResultListsEntity resultListsEntity)  {
-        // 取表名
-        String[] tableNames = processDao.getTablesName();
-        // 执行数据插入，线路数据插入result的01109-011015 +02201，节点数据插入01209-012014
+        // 时间轴,获取时间并插入表
+        String[] times = new String[1];
+        times[0] = dateUtils.timelineUtil(countDev2+1);
+        countDev2++;
+        // 执行数据插入，线路数据插入result的line021-line029，节点数据插入node021-027
         List<LineResultEntity> lineList = resultListsEntity.getLineResultEntityList();
         List<NodeResultEntity> nodeList = resultListsEntity.getNodeResultEntityList();
         /*
         发送给前端,对lineList做一下拆分，拆分为一条线路一个实体类
-        先查线路对应的node_num
          */
-        String[] numbers = processDao.getNodeNum();
-        for (int i=0; i<lineList.size(); i++){
-            // 返回list放入节点的编号，如zh001
-            for (int j=0;j<15;j++){
-                ListsResEntity listsResEntity = new ListsResEntity();
-                listsResEntity.setNodeNum(numbers[120+i*15+j]);
-                lineDataProcessor(lineList, i, j, listsResEntity);
-            }
-        }
-
-        for (int i=0; i<nodeList.size(); i++){
-            for(int j=0;j<15;j++){
-                // 返回list放入节点的编号，如zh001
-                //每次需要传只含有一个点的信息的集合给前端 所以每次循环都需要新建一个集合和一个实体类。
-                ListsResEntity listsResEntity = new ListsResEntity();
-                listsResEntity.setNodeNum(numbers[i*15+j+335]);
-                nodeDataProcessor(nodeList, i, j, listsResEntity);
-            }
-
-        }
-        for (int i=0; i<14; i++){
-            if (i<8){
-                // 插入线路的数据,设备一的线路结果数据表从01101-01108，对应names位置0-7
-                processDao.insertLineResult(tableNames[i+8],lineList.get(i));
+        for (int i=0; i<Dev2LineTableNum; i++){
+            if (i != Dev2LineTableNum-1){
+                for (int j=0;j<15;j++){
+                    ListsResEntity listsResEntity = new ListsResEntity();
+                    // 编号从设备1节点的最后一个编号位置接续
+                    listsResEntity.setNodeNum(Dev2LineNums[i*15+j]);
+                    listsResEntity.setTimes(times);
+                    lineDataProcessor(lineList, i, j, listsResEntity);
+                }
             }else {
-                // 插入节点的数据，设备一的节点结果数据表从01202-01208，对应names位置16-22
-                processDao.insertNodeResult(tableNames[i+15], nodeList.get(i-8));
+                int end = Dev2LineNum%15;
+                for (int j=0;j<end;j++){
+                    ListsResEntity listsResEntity = new ListsResEntity();
+                    // 编号从设备1节点的最后一个编号位置接续
+                    listsResEntity.setNodeNum(Dev2LineNums[i*15+j]);
+                    listsResEntity.setTimes(times);
+                    lineDataProcessor(lineList, i, j, listsResEntity);
+                }
             }
         }
 
+        for (int i=0; i<Dev2NodeTableNum; i++){
+            if (i != Dev2NodeTableNum-1){
+                for(int j=0;j<15;j++){
+                    ListsResEntity listsResEntity = new ListsResEntity();
+                    listsResEntity.setNodeNum(Dev2NodeNums[i*15+j]);
+                    listsResEntity.setTimes(times);
+                    nodeDataProcessor(nodeList, i, j, listsResEntity);
+                }
+            }else {
+                int end = Dev2NodeNum%15;
+                for(int j=0;j<end;j++){
+                    ListsResEntity listsResEntity = new ListsResEntity();
+                    listsResEntity.setNodeNum(Dev2NodeNums[i*15+j]);
+                    listsResEntity.setTimes(times);
+                    nodeDataProcessor(nodeList, i, j, listsResEntity);
+                }
+            }
 
-        //Dev2中线路负载率的结果
-        LoadRateUtil loadRateUtil=new LoadRateUtil();
-        List<LineResultEntity> lineList1=new ArrayList<>();
-        Float[] lineRatedCapacity = processDao.getLineRatedCurrentDev2();
-        //取出Dev2中所有线路的信息
-        for (int i=0; i<8;i++){
-            LineResultEntity lineResultEntity = processDao.selectLineData(tableNames[i+8]);
-            lineList1.add(lineResultEntity);
         }
-        List<LoadRateEntity> lineLoadRatioDev2 = loadRateUtil.lineLoadRatioDev2(lineList1,lineRatedCapacity);
-        //更新dev2中的线路负载率
+        // 数据入库中的结果表
+        for (int i=0; i < Dev2LineTableNum+Dev2NodeTableNum; i++){
+            if (i < Dev2LineTableNum){
+                // 插入线路的数据,对应tableNames位置i+13
+                processDao.insertLineResult(tableNames[i+Dev1LineTableNum+Dev1NodeTableNum], lineList.get(i));
+            }else {
+                // 插入节点的数据，对应tableNames位置i+13
+                processDao.insertNodeResult(tableNames[i+Dev1LineTableNum+Dev1NodeTableNum], nodeList.get(i-Dev2LineTableNum));
+            }
+        }
+        /*
+           线路负载率=单相电流/额定电流
+         */
+        LoadRateUtil loadRateUtil = new LoadRateUtil();
+        List<LineResultEntity> lineList2 = new ArrayList<>();
+        Float[] lineRatedCapacity = processDao.getLineRatedCurrentDev2();
+        // 取库中各线路的额定电流
+        for (int i=0; i<Dev2LineTableNum; i++){
+            // 从库中取出设备2的最新的一次线路的三相电流、有功无功等数据
+            LineResultEntity lineResultEntity = processDao.selectLineData(tableNames[i+Dev1LineTableNum+Dev1NodeTableNum]);
+            lineList2.add(lineResultEntity);
+        }
+        // 执行线路负载率的计算
+        List<LoadRateEntity> lineLoadRatioDev2 = loadRateUtil.lineLoadRate(Dev2LineNums,lineList2,lineRatedCapacity);
+        // 更新dev2中的线路负载率
         processDao.updateLineLoadRatioDev2(lineLoadRatioDev2);
-
-
-//        //Dev2中端点负载率的结果
-//        Float[] nodeCapacity = resultListsEntity.getNodeCapacity();
-//        Float[] nodeRatedCapacity = processDao.getNodeRatedCapacityDev2();
-//        List<Float> nodeLoadRatio = loadRateUtil.nodeLoadRatioDev2(nodeCapacity,nodeRatedCapacity);
+        /*
+        变电站负载率=UI/额定容量
+         */
+        // 取读取数据中的UI值
+        Float[] uis = resultListsEntity.getNodeUI();
+        // 取库中的变电站的额定容量
+        Float[] nodeRatedCapacity = processDao.getNodeRatedCapacityDev2();
+        List<LoadRateEntity> nodeLoadRatioDev1 = loadRateUtil.nodeLoadRate(Dev2NodeNums,uis,nodeRatedCapacity);
+        // 更新库中的变电站负载率
+        processDao.updateNodeLoadRatioDev1(nodeLoadRatioDev1);
     }
 
     /**
