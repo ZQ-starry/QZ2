@@ -16,7 +16,6 @@ import com.sx.qz2.util.DateUtils;
 import com.sx.qz2.util.LoadRateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -85,19 +84,19 @@ public class ProcessServiceImpl implements ProcessService{
         String[] nodeNums = processDao.getNodeNum();
         // 编号的分类
         for (int i=0; i<nodeNums.length; i++){
-            // 设备1线路编号
+            // Dev1LineNums+Dev2LineNums+Dev1NodeNums+Dev2NodeNums
             if (i<Dev1LineNum+Dev1NodeNum+Dev2LineNum){
-                if (i<Dev1LineNum+Dev1NodeNum){
+                if (i<Dev1LineNum+Dev2LineNum){
                     if (i<Dev1LineNum){
                         Dev1LineNums[i] = nodeNums[i];
                     }else {
-                        Dev1NodeNums[i-Dev1LineNum] = nodeNums[i];
+                        Dev2LineNums[i-Dev1LineNum] = nodeNums[i];
                     }
                 }else {
-                    Dev2LineNums[i-Dev1LineNum+Dev1NodeNum] = nodeNums[i];
+                    Dev1NodeNums[i-Dev1LineNum-Dev2LineNum] = nodeNums[i];
                 }
             }else {
-                Dev2NodeNums[i-Dev1LineNum+Dev1NodeNum+Dev2LineNum] = nodeNums[i];
+                Dev2NodeNums[i-Dev1LineNum-Dev1NodeNum-Dev2LineNum] = nodeNums[i];
             }
         }
         // 截断所有结果表
@@ -108,13 +107,13 @@ public class ProcessServiceImpl implements ProcessService{
     }
 
     @Override
-    @Transactional
+//    @Transactional
     public void dev1DataProcess (ResultListsEntity resultListsEntity)  {
         // 时间轴,获取时间并入库
         String[] times = new String[1];
         times[0] = dateUtils.timelineUtil(countDev1+1);
         countDev1++;
-        processDao.insertTime(times[0]);
+        int value = processDao.insertTime(times[0]);
 
         List<LineResultEntity> lineList = resultListsEntity.getLineResultEntityList();
         List<NodeResultEntity> nodeList = resultListsEntity.getNodeResultEntityList();
@@ -193,7 +192,7 @@ public class ProcessServiceImpl implements ProcessService{
         // 执行线路负载率的计算,把节点的编号一起传过去处理
         List<LoadRateEntity>  lineLoadRatioDev1 = loadRateUtil.lineLoadRate(Dev1LineNums,lineList1, ratedCurrents);
         // 更新dev1中线路负载率
-        processDao.updateLineLoadRatioDev1(lineLoadRatioDev1);
+        int value1 = processDao.updateLineLoadRatioDev1(lineLoadRatioDev1);
         /*
         变电站负载率=UI/额定容量
          */
@@ -203,12 +202,13 @@ public class ProcessServiceImpl implements ProcessService{
         Float[] nodeRatedCapacity = processDao.getNodeRatedCapacityDev1();
         List<LoadRateEntity> nodeLoadRatioDev1 = loadRateUtil.nodeLoadRate(Dev1NodeNums,uis,nodeRatedCapacity);
         // 更新库中的变电站负载率
-        processDao.updateNodeLoadRatioDev1(nodeLoadRatioDev1);
+        int value2 = processDao.updateNodeLoadRatioDev1(nodeLoadRatioDev1);
         /**
          * 查询一次所有的负载率，发送给前端
          */
         ListsResEntity listsResEntity1 = dataReadServiceImpl.loadRateRead();
         webSocketService.sendTextMsg("/response/getLoadRate",listsResEntity1);
+        System.out.println("设备1读取结束");
     }
 
     @Override
@@ -298,7 +298,8 @@ public class ProcessServiceImpl implements ProcessService{
         Float[] nodeRatedCapacity = processDao.getNodeRatedCapacityDev2();
         List<LoadRateEntity> nodeLoadRatioDev1 = loadRateUtil.nodeLoadRate(Dev2NodeNums,uis,nodeRatedCapacity);
         // 更新库中的变电站负载率
-        processDao.updateNodeLoadRatioDev1(nodeLoadRatioDev1);
+        processDao.updateNodeLoadRatioDev2(nodeLoadRatioDev1);
+        System.out.println("设备2读取结束");
     }
 
     /**

@@ -26,7 +26,9 @@ public class LoadRateUtil {
                 }
                 for (int j = 0; j < 15; j++) {
                     // 取A相电流有效值进行计算
-                    lineCurrent[i * 15 + j] = ((Float) fields[j * 5].get(lineResultEntity));
+                    if (i *15+j < ratedCurrents.length){
+                        lineCurrent[i * 15 + j] = ((Float) fields[j * 5].get(lineResultEntity));
+                    }
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -49,13 +51,14 @@ public class LoadRateUtil {
      * @param nodeRatedCapacity
      * @return
      */
-    public List<LoadRateEntity>  nodeLoadRate(String[] nodeNums,Float[] uis, Float[] nodeRatedCapacity) {
+    public List<LoadRateEntity> nodeLoadRate(String[] nodeNums,Float[] uis, Float[] nodeRatedCapacity) {
         List<LoadRateEntity>  loadRateList=new ArrayList<>();
         for (int i=0; i<uis.length; i++) {
             LoadRateEntity loadRateEntity = new LoadRateEntity();
             loadRateEntity.setId(i+1);
             loadRateEntity.setNodeNum(nodeNums[i]);
-            loadRateEntity.setLoadRate(uis[i]/nodeRatedCapacity[i]);
+            float value = (float) ((uis[i]/nodeRatedCapacity[i]/1000000)*Math.sqrt(3));
+            loadRateEntity.setLoadRate(value);
             loadRateList.add(loadRateEntity);
         }
       return  loadRateList;

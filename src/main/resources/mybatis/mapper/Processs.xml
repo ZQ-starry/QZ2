@@ -84,7 +84,7 @@
                 load_rate=#{entity.loadRate}
             </set>
             <where>
-                id=#{entity.nodeNum}
+                node_num=#{entity.nodeNum}
             </where>
         </foreach>
     </update>
@@ -96,7 +96,7 @@
                 load_rate=#{entity.loadRate}
             </set>
             <where>
-                id=#{entity.nodeNum}
+                node_num=#{entity.nodeNum}
             </where>
         </foreach>
     </update>
@@ -108,7 +108,19 @@
                 load_rate=#{entity.loadRate}
             </set>
             <where>
-                id=#{entity.nodeNum}
+                node_num=#{entity.nodeNum}
+            </where>
+        </foreach>
+    </update>
+
+    <update id="updateNodeLoadRatioDev2" parameterType="java.util.List">
+        <foreach collection="updateList" item="entity" separator=";">
+            UPDATE dev2_load_rate_node
+            <set>
+                load_rate=#{entity.loadRate}
+            </set>
+            <where>
+                node_num=#{entity.nodeNum}
             </where>
         </foreach>
     </update>

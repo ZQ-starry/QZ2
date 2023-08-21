@@ -38,21 +38,21 @@ public interface ProcessDao {
 
     int updateLineLoadRatioDev1( List<LoadRateEntity> updateList);
 
-    int updateNodeLoadRatioDev1(List<LoadRateEntity>updateList);
+    int updateNodeLoadRatioDev1(List<LoadRateEntity> updateList);
 
-    int updateLineLoadRatioDev2( List<LoadRateEntity> updateList);
+    int updateLineLoadRatioDev2(List<LoadRateEntity> updateList);
 
-    // int updateNodeLoadRatioDev2(List<LoadRateEntity> updateList);
+     int updateNodeLoadRatioDev2(List<LoadRateEntity> updateList);
 
     LineResultEntity selectLineData(String tableName);
 
-    void insertLineResult(@Param("tableName") String name, @Param("line") LineResultEntity lineResultEntity);
+    void insertLineResult(@Param("tableName") String name, @Param("line")LineResultEntity lineResultEntity);
 
     void insertNodeResult(@Param("tableName") String name, @Param("node")NodeResultEntity nodeResultEntity);
 
     @Options(useGeneratedKeys=true)
     @Insert("INSERT INTO time_axis SET time = #{time}")
-    void insertTime(String time);
+    int insertTime(String time);
 
 
 }

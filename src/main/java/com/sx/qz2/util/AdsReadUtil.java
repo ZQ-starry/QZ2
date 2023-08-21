@@ -21,9 +21,11 @@ import java.util.List;
  */
 public class AdsReadUtil {
 
-    private static final String NetId1 = "169.254.118.233.1.1"; // 设备1 NetId
+    private static final String NetId1 = "169.254.127.79.1.1"; // 设备201 NetId
+//    private static final String NetId1 = "169.254.35.69.1.1"; // 设备501 NetId
 
-    private static final String NetId2 = "192.168.1.50.1.1"; // 设备2 NetId
+    private static final String NetId2 = "169.254.251.57.1.1"; // 设备202 NetId
+//    private static final String NetId2 = "169.254.227.168.1.1"; // 设备502 NetId
 
     /**
      * 8.14拆分版本：设备1含25个T节点，变电站39，电厂22，牵引站3，线路102
@@ -36,22 +38,22 @@ public class AdsReadUtil {
         //用来存40个变电站的UI值
         Float[] nodeUIFloats = new Float[39];
         //该长度代表8张线路表 7张节点表 以及82个节点(实际容量) 需要的数据长度
-        int length = (7*75+6*45+40)*4;
+        int length = (7*75+6*45+39)*4;
         long err;
         AmsAddr addr = new AmsAddr();
         try {
             AdsCallDllFunction.adsPortOpen();
             err = AdsCallDllFunction.getLocalAddress(addr);
             addr.setNetIdStringEx(NetId1);
-            addr.setPort(851);
+            addr.setPort(853);
             if (err != 0) {
-                System.out.println("Read Error PLC1: 0x"
+                System.out.println("Read Error DEV1: 0x"
                         + Long.toHexString(err));
             } else {
-                System.out.println("Read Success: Open PLC1 communication!");
+                System.out.println("Read Success: Open DEV1 communication!");
             }
             JNIByteBuffer hdlBuff = new JNIByteBuffer(4);
-            JNIByteBuffer symBuff = new JNIByteBuffer(Convert.StringToByteArr("MAIN.PLCVar", false));
+            JNIByteBuffer symBuff = new JNIByteBuffer(Convert.StringToByteArr("MAIN.AllData", false));
             JNIByteBuffer dataBuff = new JNIByteBuffer(length);
             err = AdsCallDllFunction.adsSyncReadWriteReq(
                     addr,
@@ -99,14 +101,14 @@ public class AdsReadUtil {
                         lineList.add(lineResultEntity);
                     } else if(i==13){
                         // 处理 UI数据
-                        for (int j=0;j<40;j++){
-                            nodeUIFloats[j]=responseBuffer.getFloat(3180+j*4); // 3180=(7*75+6*45)*4
+                        for (int j=0;j<39;j++){
+                            nodeUIFloats[j]=responseBuffer.getFloat(3180+j*4); // 3180=2100+1080=(7*75+6*45)*4
                         }
                     }
                     else {
                         // 处理节点数据
                         for (int j = 0; j < 45; j++) {
-                            nodes[j].set(nodeResultEntity, responseBuffer.getFloat(i*300+(i-7)*45*4 + j*4));
+                            nodes[j].set(nodeResultEntity, responseBuffer.getFloat(2100+(i-7)*45*4 + j*4));
                         }
                         nodeList.add(nodeResultEntity);
                     }
@@ -133,7 +135,7 @@ public class AdsReadUtil {
         ResultListsEntity resultListsEntity = new ResultListsEntity();
         List<LineResultEntity> lineList = new ArrayList<>();
         List<NodeResultEntity> nodeList = new ArrayList<>();
-        //用来存41个节点的实际容量
+        //用来存43个节点的实际容量
         Float[] nodeUIFloats = new Float[43];
         int length = (9*75+7*45+43)*4;
         long err;
@@ -141,16 +143,16 @@ public class AdsReadUtil {
         try {
             AdsCallDllFunction.adsPortOpen();
             err = AdsCallDllFunction.getLocalAddress(addr);
-            addr.setNetIdStringEx(NetId1);
-            addr.setPort(851);
+            addr.setNetIdStringEx(NetId2);
+            addr.setPort(853);
             if (err != 0) {
-                System.out.println("Read Error PLC1: 0x"
+                System.out.println("Read Error PLC2: 0x"
                         + Long.toHexString(err));
             } else {
-                System.out.println("Read Success: Open PLC1 communication!");
+                System.out.println("Read Success: Open PLC2 communication!");
             }
             JNIByteBuffer hdlBuff = new JNIByteBuffer(4);
-            JNIByteBuffer symBuff = new JNIByteBuffer(Convert.StringToByteArr("MAIN.PLCVar", false));
+            JNIByteBuffer symBuff = new JNIByteBuffer(Convert.StringToByteArr("MAIN.AllData", false));
             JNIByteBuffer dataBuff = new JNIByteBuffer(length);
             err = AdsCallDllFunction.adsSyncReadWriteReq(
                     addr,
@@ -199,12 +201,12 @@ public class AdsReadUtil {
                     } else if(i==16){
                         // 处理 UI数据
                         for (int j=0;j<43;j++){
-                            nodeUIFloats[j]=responseBuffer.getFloat(3960+j*4); // 3960=(9*75+7*45)*4
+                            nodeUIFloats[j]=responseBuffer.getFloat(3960+j*4); // 3660=2400+1260=(9*75+7*45)*4
                         }
                     } else {
                         // 处理节点数据
                         for (int j = 0; j < 45; j++) {
-                            nodes[j].set(nodeResultEntity, responseBuffer.getFloat(i*300+(i-9)*45*4 + j*4));
+                            nodes[j].set(nodeResultEntity, responseBuffer.getFloat(2700+(i-9)*45*4 + j*4)); // 2400=9*75*4
                         }
                         nodeList.add(nodeResultEntity);
                     }
@@ -217,6 +219,8 @@ public class AdsReadUtil {
         }
         resultListsEntity.setLineResultEntityList(lineList);
         resultListsEntity.setNodeResultEntityList(nodeList);
+        resultListsEntity.setNodeUI(nodeUIFloats);
         return resultListsEntity;
     }
+
 }
